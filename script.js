@@ -1,3 +1,5 @@
+// script.js
+
 // Quiz Data
 const quizData = [
     {
@@ -18,7 +20,7 @@ const quizData = [
         correct: "Zēn",
         time: 60 // 60 seconds for this question
     },
-    // Ajoutez plus de questions selon vos besoins
+    // Add more questions as needed
 ];
 
 // State Variables
@@ -26,6 +28,7 @@ let currentQuestion = 0;
 let score = 0;
 let timeLeft = 0;
 let timerInterval;
+let shuffledQuizData = []; // Array to hold shuffled questions
 
 // DOM Elements
 const questionEl = document.getElementById('question');
@@ -55,8 +58,28 @@ const timerSound = new Audio('resources/clock-timer-reverb.mp3');
 timerSound.loop = true;
 
 /**
- * Commence le compte à rebours du timer.
- * @param {number} duration - Durée du timer en secondes.
+ * Shuffles an array in place using the Fisher-Yates algorithm.
+ * @param {Array} array - The array to shuffle.
+ */
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+/**
+ * Initializes the quiz by shuffling questions.
+ */
+function initializeQuiz() {
+    // Create a copy of quizData to avoid mutating the original array
+    shuffledQuizData = [...quizData];
+    shuffleArray(shuffledQuizData);
+}
+
+/**
+ * Starts the countdown timer.
+ * @param {number} duration - Duration in seconds.
  */
 function startTimer(duration) {
     timeLeft = duration;
@@ -81,15 +104,19 @@ function startTimer(duration) {
 }
 
 /**
- * Charge la question actuelle et génère les boutons d'options.
+ * Loads the current question and generates shuffled option buttons.
  */
 function loadQuestion() {
     resetState();
-    const currentQuizData = quizData[currentQuestion];
+    const currentQuizData = shuffledQuizData[currentQuestion];
     questionEl.textContent = currentQuizData.question;
-    optionsContainer.innerHTML = ''; // Vider les options précédentes
+    optionsContainer.innerHTML = ''; // Clear previous options
 
-    currentQuizData.options.forEach((option, index) => {
+    // Shuffle the options before displaying
+    let shuffledOptions = [...currentQuizData.options];
+    shuffleArray(shuffledOptions);
+
+    shuffledOptions.forEach((option, index) => {
         const button = document.createElement('button');
         button.classList.add('option-btn');
         button.textContent = option;
@@ -105,7 +132,7 @@ function loadQuestion() {
 }
 
 /**
- * Réinitialise l'état avant de charger une nouvelle question.
+ * Resets the state before loading a new question.
  */
 function resetState() {
     nextBtn.disabled = true;
@@ -114,9 +141,9 @@ function resetState() {
 }
 
 /**
- * Sélectionne une option et vérifie la réponse.
- * @param {HTMLElement} selectedButton - Le bouton sélectionné.
- * @param {string} correctAnswer - La bonne réponse.
+ * Handles the selection of an option and checks the answer.
+ * @param {HTMLElement} selectedButton - The selected button element.
+ * @param {string} correctAnswer - The correct answer.
  */
 function selectOption(selectedButton, correctAnswer) {
     const allOptionButtons = document.querySelectorAll('.option-btn');
@@ -131,7 +158,7 @@ function selectOption(selectedButton, correctAnswer) {
     } else {
         selectedButton.classList.add('wrong');
         playRandomSound(wrongSounds);
-        // Mettre en évidence la bonne réponse
+        // Highlight the correct answer
         allOptionButtons.forEach(button => {
             if (button.textContent === correctAnswer) {
                 button.classList.add('correct');
@@ -139,13 +166,13 @@ function selectOption(selectedButton, correctAnswer) {
         });
     }
 
-    // Désactiver tous les boutons d'options
+    // Disable all option buttons
     allOptionButtons.forEach(button => button.disabled = true);
     nextBtn.disabled = false;
 }
 
 /**
- * Désactive toutes les options lorsque le temps est écoulé.
+ * Disables all option buttons when time runs out.
  */
 function disableOptions() {
     const allOptionButtons = document.querySelectorAll('.option-btn');
@@ -153,10 +180,10 @@ function disableOptions() {
 }
 
 /**
- * Met en évidence la bonne réponse lorsque le temps est écoulé.
+ * Highlights the correct answer when time runs out.
  */
 function highlightCorrectAnswer() {
-    const currentQuizData = quizData[currentQuestion];
+    const currentQuizData = shuffledQuizData[currentQuestion];
     const allOptionButtons = document.querySelectorAll('.option-btn');
     allOptionButtons.forEach(button => {
         if (button.textContent === currentQuizData.correct) {
@@ -166,13 +193,13 @@ function highlightCorrectAnswer() {
 }
 
 /**
- * Affiche les résultats finaux du quiz.
+ * Displays the final results of the quiz.
  */
 function showResults() {
     progressBar.style.width = `100%`;
     document.querySelector('.quiz-container').innerHTML = `
         <h2>Laksǐ Mie!</h2>
-        <p>Yo mvǎkpii: ${score} nɑ́ ${quizData.length}</p>
+        <p>Yo mvǎkpii: ${score} nɑ́ ${shuffledQuizData.length}</p>
         <button id="replay-btn" class="replay-btn">Patntō'</button>
     `;
     document.getElementById('replay-btn').addEventListener('click', () => {
@@ -183,16 +210,16 @@ function showResults() {
 }
 
 /**
- * Met à jour la barre de progression.
+ * Updates the progress bar based on the current question.
  */
 function updateProgressBar() {
-    const progressPercent = ((currentQuestion) / quizData.length) * 100;
+    const progressPercent = ((currentQuestion) / shuffledQuizData.length) * 100;
     progressBar.style.width = `${progressPercent}%`;
 }
 
 /**
- * Joue un son aléatoire à partir d'un tableau de chemins de fichiers audio.
- * @param {Array} soundsArray - Tableau contenant les chemins des fichiers audio.
+ * Plays a random sound from the provided array.
+ * @param {Array} soundsArray - Array of sound file paths.
  */
 function playRandomSound(soundsArray) {
     const randomIndex = Math.floor(Math.random() * soundsArray.length);
@@ -203,9 +230,10 @@ function playRandomSound(soundsArray) {
 }
 
 /**
- * Démarre le quiz après l'interaction de l'utilisateur.
+ * Starts the quiz after user interaction.
  */
 function startQuiz() {
+    initializeQuiz(); // Shuffle questions at the start
     startScreen.style.display = 'none';
     document.getElementById('question-container').style.display = 'block';
     document.getElementById('options-container').style.display = 'flex';
@@ -213,16 +241,16 @@ function startQuiz() {
     loadQuestion();
 }
 
-// Gestionnaire de clic pour le bouton "Start Quiz".
+// Event Listener for Start Quiz Button
 startBtn.addEventListener('click', () => {
     startQuiz();
 });
 
-// Gestionnaire de clic pour le bouton "Question Suivante".
+// Event Listener for Next Question Button
 nextBtn.addEventListener('click', () => {
     currentQuestion++;
     updateProgressBar();
-    if (currentQuestion < quizData.length) {
+    if (currentQuestion < shuffledQuizData.length) {
         loadQuestion();
     } else {
         showResults();
