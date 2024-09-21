@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Má'zhínǔ Nufī</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome for Social Media Icons -->
+
+    <!-- Correct Font Awesome CDN Link -->
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-papN1KJ3zSeiU49NwZ+Xq5ZboS9V7DFJcKxjHLOERmTqB4EIZ6NdO7o/Q3g4QuGsQk6FQ0DZAbA3xyy75PjKUw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+    />
+
+    <script src="https://kit.fontawesome.com/74fb0e9d79.js" crossorigin="anonymous"></script>
+    
+</head>
+<body>
+    <div class="quiz-container">
+        <header>
+            <h1>Má'zhínǔ Nufī</h1>
+            <div class="score-timer">
+                <div class="score">Mvǎkpii: <span id="score">0</span></div>
+                <div class="timer">Mvǎkntie': <span id="time">...</span></div>
+            </div>
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </header>
+        <main>
+            <!-- Start Screen -->
+            <div class="start-screen" id="start-screen">
+                <!-- Logo -->
+                <img src="resources/resulam_logo_egg.png" alt="Resulam Logo" class="logo">
+                
+                <!-- Author Description -->
+                <div class="author-description">
+                    <p>
+                        This quiz was created by Shck Tchamna for Resulam. Please support its development.
+                    </p>
+                </div>
+                
+                <!-- Dictionary Promotion -->
+                <div class="dictionary-promotion">
+                    <p>
+                        To learn Nufi languages seriously, get this dictionary: 
+                        <a href="https://play.google.com/store/apps/details?id=com.resulam.android.NufiTchamna_nufi_francais_nufi&hl=en_US&pli=1" target="_blank" rel="noopener noreferrer">
+                            Download on Google Play Store
+                        </a>.
+                    </p>
+                </div>
+                
+                <!-- Social Media Links -->
+                <div class="social-media">
+                    <a href="https://www.youtube.com/resulam" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="https://www.facebook.com/resulam" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    
+                    <!-- Add more social media links as needed -->
+                </div>
+                
+                <!-- Start Quiz Button -->
+                <button id="start-btn" class="start-btn">Ghěnmbhi</button>
+            </div>
+            <!-- Question and Options -->
+            <div class="question-container" id="question-container" style="display: none;">
+                <h2 id="question">Te'sínǔ imbɑ̄ sée le</h2>
+            </div>
+            <div class="options-container" id="options-container" style="display: none;">
+                <!-- Option buttons will be generated here -->
+            </div>
+        </main>
+        <footer>
+            <button class="next-btn" id="next-btn" disabled style="display: none;">Ghěnmbhi</button>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
