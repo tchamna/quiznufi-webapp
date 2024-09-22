@@ -10,42 +10,7 @@
     <!-- Font Awesome Kit Script -->
     <script src="https://kit.fontawesome.com/74fb0e9d79.js" crossorigin="anonymous"></script>
 
-    <!-- Firebase SDKs (Modular) -->
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-
-        // import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-        // import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-analytics.js";
-        // import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
-
-        // Import Firebase SDKs from local modules
-        import { initializeApp } from "firebase/app";
-        import { getAnalytics } from "firebase/analytics";
-        import { getFirestore, collection, getDocs } from "firebase/firestore";
-
-
-       
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyD3o_x4T7GYYLiu1flONMp51s4bDYR7Wk8",
-            authDomain: "quiznufi-webapp.firebaseapp.com",
-            projectId: "quiznufi-webapp",
-            storageBucket: "quiznufi-webapp.appspot.com",
-            messagingSenderId: "152882309249",
-            appId: "1:152882309249:web:ede638ed5e43af680e0580",
-            measurementId: "G-M0GDQ743RV"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        // const analytics = getAnalytics(app); // Optional
-
-        // Initialize Firestore
-        const db = getFirestore(app);
-
-        // Make `db` available globally so that your script files can access it.
-        window.db = db;
-    </script>
+    
 </head>
 
 <body>
