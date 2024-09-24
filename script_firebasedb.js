@@ -23,7 +23,6 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
-
 // State Variables
 let currentQuestion = 0;
 let score = 0;
@@ -53,8 +52,17 @@ const wrongSounds = [
     'resources/wrong_answer2.mp3',
 ];
 
-const timerSound = new Audio('resources/quiz-game-music-loop.mp3');
-timerSound.loop = true;
+// Create the background music audio object
+const timerSound = new Audio('resources/background_music_Kameni_Lebong_Esclavage.mp3');
+timerSound.loop = false; // Set to false to allow the music to end before restarting
+
+// Event Listener for when the music ends, so it can restart
+timerSound.addEventListener('ended', () => {
+    timerSound.currentTime = 0;
+    timerSound.play().catch(error => {
+        console.warn('Timer sound playback was prevented:', error);
+    });
+});
 
 /**
  * Shuffles an array in place using the Fisher-Yates algorithm.
@@ -94,12 +102,7 @@ function startTimer(duration) {
     timeLeft = duration;
     timeEl.textContent = timeLeft;
 
-    if (timerSound.paused) {
-        timerSound.play().catch(error => {
-            console.warn('Timer sound playback was prevented:', error);
-        });
-    }
-
+    // Timer logic
     timerInterval = setInterval(() => {
         timeLeft--;
         timeEl.textContent = timeLeft;
@@ -153,9 +156,7 @@ function resetState() {
     nextBtn.disabled = true;
     clearInterval(timerInterval);
     clearTimeout(autoNextTimeout);
-    timerSound.pause(); // Reset the background music
-    timerSound.currentTime = 0;
-    timerSound.play(); // Restart the background music
+    // Remove unnecessary pause and play logic for the background music
 }
 
 /**
@@ -186,7 +187,6 @@ function selectOption(selectedButton, correctAnswer) {
     // Disable all option buttons
     allOptionButtons.forEach(button => button.disabled = true);
     nextBtn.disabled = false;
-    timerSound.play(); // Keep background music playing
 }
 
 /**
@@ -256,6 +256,12 @@ function startQuiz() {
         document.getElementById('question-container').style.display = 'block';
         document.getElementById('options-container').style.display = 'flex';
         nextBtn.style.display = 'inline-block';
+
+        // Start background music once when the quiz starts
+        timerSound.play().catch(error => {
+            console.warn('Timer sound playback was prevented:', error);
+        });
+
         loadQuestion();
     });
 }
