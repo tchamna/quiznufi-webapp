@@ -17,6 +17,63 @@ body {
     padding: 20px; /* Added padding for smaller screens */
 }
 
+/* ##################################### */
+.start-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; /* Add spacing between elements */
+    padding: 20px; /* Add padding for some breathing room */
+}
+
+.question-count-container {
+    margin-bottom: 20px; /* Add space below the input field */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Space between label and input */
+}
+
+#question-count {
+    width: 200px; /* Set a fixed width for the input */
+    padding: 10px; /* Add padding for better appearance */
+    font-size: 16px; /* Increase font size for better readability */
+    text-align: center; /* Center the text inside the input */
+}
+
+
+/* ########################### */
+
+/* Add this to your CSS file */
+
+#progress-bar {
+    height: 100%;
+    background-color: #4caf50; /* Highlight color */
+    width: 0%; /* Initial width */
+    border-radius: 10px;
+    transition: width 0.4s ease; /* Smooth transition */
+}
+
+/* .progress-bar {
+    height: 10px;
+    width: 0%;
+    background-color: #6a11cb;
+    transition: width 0.3s;
+} */
+
+
+#question-progress-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+    z-index: 1; /* Ensure it appears above the progress bar */
+}
+
+
 .quiz-container {
     background: #ffffff;
     border-radius: 15px;
@@ -143,11 +200,15 @@ footer {
     transform: translateY(-5px);
 }
 
+
+
 .start-btn {
+    padding: 10px 20px; /* Add padding to the button */
+    font-size: 16px; /* Increase font size */
     background: #4CAF50;
     border: none;
     color: white;
-    padding: 1rem 2rem;
+    /* padding: 1rem 2rem; */
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -158,6 +219,7 @@ footer {
     transition: background 0.3s, transform 0.2s;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
+
 
 .start-btn:hover {
     background: #45a049;
@@ -207,19 +269,17 @@ footer {
 }
 
 .progress-container {
+    position: relative;
     width: 100%;
-    background-color: #e0e0e0;
-    border-radius: 25px;
-    margin-top: 15px;
-    overflow: hidden;
+    height: 20px;
+    background-color: #f3f3f3;
+    border-radius: 10px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
 }
 
-.progress-bar {
-    height: 10px;
-    width: 0%;
-    background-color: #6a11cb;
-    transition: width 0.3s;
-}
+
 
 /* Responsive Design */
 
