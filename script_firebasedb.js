@@ -23,11 +23,13 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
+
 // State Variables
 let currentQuestion = 0;
 let score = 0;
 let timeLeft = 0;
 let timerInterval;
+let autoNextTimeout;
 let shuffledQuizData = []; // Array to hold shuffled questions
 
 // DOM Elements
@@ -44,17 +46,14 @@ const startBtn = document.getElementById('start-btn');
 const correctSounds = [
     'resources/correct_answer1.mp3',
     'resources/correct_answer2.mp3',
-    'resources/correct_answer3.mp3'
 ];
 
 const wrongSounds = [
     'resources/wrong_answer1.mp3',
     'resources/wrong_answer2.mp3',
-    'resources/wrong_answer3.mp3',
-    'resources/wrong_answer4.mp3'
 ];
 
-const timerSound = new Audio('resources/clock-timer-reverb.mp3');
+const timerSound = new Audio('resources/quiz-game-music-loop.mp3');
 timerSound.loop = true;
 
 /**
@@ -94,10 +93,12 @@ async function initializeQuiz() {
 function startTimer(duration) {
     timeLeft = duration;
     timeEl.textContent = timeLeft;
-    timerSound.currentTime = 0;
-    timerSound.play().catch(error => {
-        console.warn('Timer sound playback was prevented:', error);
-    });
+
+    if (timerSound.paused) {
+        timerSound.play().catch(error => {
+            console.warn('Timer sound playback was prevented:', error);
+        });
+    }
 
     timerInterval = setInterval(() => {
         timeLeft--;
@@ -105,10 +106,14 @@ function startTimer(duration) {
 
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            timerSound.pause();
-            disableOptions();
             highlightCorrectAnswer();
+            disableOptions();
             nextBtn.disabled = false;
+
+            // Move to the next question automatically after 15 seconds
+            autoNextTimeout = setTimeout(() => {
+                nextQuestion();
+            }, 15000);
         }
     }, 1000);
 }
@@ -147,7 +152,10 @@ function loadQuestion() {
 function resetState() {
     nextBtn.disabled = true;
     clearInterval(timerInterval);
-    timerSound.pause();
+    clearTimeout(autoNextTimeout);
+    timerSound.pause(); // Reset the background music
+    timerSound.currentTime = 0;
+    timerSound.play(); // Restart the background music
 }
 
 /**
@@ -158,7 +166,6 @@ function resetState() {
 function selectOption(selectedButton, correctAnswer) {
     const allOptionButtons = document.querySelectorAll('.option-btn');
     clearInterval(timerInterval);
-    timerSound.pause();
 
     if (selectedButton.textContent === correctAnswer) {
         selectedButton.classList.add('correct');
@@ -179,6 +186,7 @@ function selectOption(selectedButton, correctAnswer) {
     // Disable all option buttons
     allOptionButtons.forEach(button => button.disabled = true);
     nextBtn.disabled = false;
+    timerSound.play(); // Keep background music playing
 }
 
 /**
@@ -252,6 +260,19 @@ function startQuiz() {
     });
 }
 
+/**
+ * Proceeds to the next question in the quiz.
+ */
+function nextQuestion() {
+    currentQuestion++;
+    updateProgressBar();
+    if (currentQuestion < shuffledQuizData.length) {
+        loadQuestion();
+    } else {
+        showResults();
+    }
+}
+
 // Event Listener for Start Quiz Button
 startBtn.addEventListener('click', () => {
     console.log('Start button clicked');
@@ -260,11 +281,5 @@ startBtn.addEventListener('click', () => {
 
 // Event Listener for Next Question Button
 nextBtn.addEventListener('click', () => {
-    currentQuestion++;
-    updateProgressBar();
-    if (currentQuestion < shuffledQuizData.length) {
-        loadQuestion();
-    } else {
-        showResults();
-    }
+    nextQuestion();
 });
