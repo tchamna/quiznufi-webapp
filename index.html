@@ -5,58 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Má'zhínǔ Nufī</title>
     <!-- Your CSS -->
-    <!-- Your CSS -->
     <link rel="stylesheet" href="styles.css">
 
     <!-- Font Awesome Kit Script -->
-    <!-- Font Awesome Kit Script -->
     <script src="https://kit.fontawesome.com/74fb0e9d79.js" crossorigin="anonymous"></script>
+    
 </head>
-
 
 <body>
     <div class="quiz-container">
-        <header>
+        <!-- Authentication Screen -->
+        <div class="auth-container" id="auth-container">
+            <!-- Login Form -->
+            <div class="auth-form" id="login-form">
+                <h2>Má'zhínǔ Nufī</h2>
+                <br>
+                <label for="login-email">Email:</label>
+                <input type="email" id="login-email" required>
+                <label for="login-password">Password:</label>
+                <input type="password" id="login-password" required>
+                <br><br>
+                <button id="login-btn" type="button" class="fancy-button">Cōndʉ̄ɑ̄ (Login)</button>
+                
+                
+                <br><br>
+                <p>Ŋwɑ̌' zēn zǒ: <a href="#" id="show-signup">Sign up here</a></p>
+            </div>
+
+
+            <!-- Signup Form -->
+            <div class="auth-form" id="signup-form" style="display: none;">
+                <h2>Sign Up</h2>
+                <label for="signup-email">Email:</label>
+                <input type="email" id="signup-email" required>
+                <label for="signup-password">Password:</label>
+                <input type="password" id="signup-password" required>
+                <button id="signup-btn" type="button">Sign Up</button>
+                <p>Already have an account? <a href="#" id="show-login">Login here</a></p>
+            </div>
+            <!-- Continue as Guest Option -->
+            <div class="guest-option" id="guest-option">
+                <p>Or</p>
+                <button id="continue-guest-btn" class="start-btn">Continue as Guest</button>
+            </div>
+        </div>
+
+        <!-- Main Quiz Content -->
+        <header style="display: none;">
             <h1>Má'zhínǔ Nufī</h1>
             <div class="score-timer">
                 <div class="score">Mvǎkpii: <span id="score">0</span></div>
                 <div class="timer">Mvǎkntie': <span id="time">...</span></div>
             </div>
-            <!-- Progress Bar -->
-            <!-- <div class="progress-container">
-                <div class="progress-bar" id="progress-bar"></div>
-            </div> -->
-
-             <!-- Progress Bar Container -->
-             <div class="progress-container">
+            <!-- Progress Bar Container -->
+            <div class="progress-container">
                 <span id="question-progress-text">0/0</span> <!-- Current question display -->
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
-            
         </header>
         <main>
             <!-- Start Screen -->
-            <div class="start-screen" id="start-screen">
+            <div class="start-screen" id="start-screen" style="display: none;">
                 <!-- Logo -->
                 <img src="resources/resulam_logo_egg.png" alt="Resulam Logo" class="logo">
-                
+
                 <!-- Author Description -->
                 <div class="author-description">
                     <p>
                         This quiz was created by Shck Tchamna for Resulam. Please support its development.
                     </p>
                 </div>
-                
+
                 <!-- Dictionary Promotion -->
                 <div class="dictionary-promotion">
                     <p>
-                        To learn Nufi languages seriously, get this dictionary: 
+                        To learn Nufi languages seriously, get this dictionary:
                         <a href="https://play.google.com/store/apps/details?id=com.resulam.android.NufiTchamna_nufi_francais_nufi&hl=en_US&pli=1" target="_blank" rel="noopener noreferrer">
                             <br>Download on Google Play Store
                         </a>.
                     </p>
                 </div>
-                
+
                 <!-- Social Media Links -->
                 <div class="social-media">
                     <a href="https://www.youtube.com/resulam" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
@@ -67,12 +96,12 @@
                     </a>
                 </div>
 
-            <!-- Number of Questions Input -->
-            <div class="question-count-input">
-                <label for="question-count"><b>Mvǎk nte'sínu</b> (Number of Questions):</label>
-                <input type="number" id="question-count" min="1" placeholder="e.g., 5">
-            </div>
-                
+                <!-- Number of Questions Input -->
+                <div class="question-count-container">
+                    <label for="question-count"><b>Mvǎk nte'sínu</b> (Number of Questions):</label>
+                    <input type="number" id="question-count" min="1" placeholder="e.g., 5">
+                </div>
+
                 <!-- Start Quiz Button -->
                 <button id="start-btn" class="start-btn">Ghěnmbhi</button>
             </div>
@@ -83,20 +112,15 @@
             <div class="options-container" id="options-container" style="display: none;">
                 <!-- Option buttons will be generated here -->
             </div>
-
-           
-
-
         </main>
         <footer>
             <button class="next-btn" id="next-btn" disabled style="display: none;">Ghěnmbhi</button>
+            <!-- Sign Out Button -->
+            <button id="signout-btn" class="signout-btn" style="display: none;">Sign Out</button>
         </footer>
     </div>
 
-    
-    <!-- Your custom scripts -->
-    <!-- <script type="module" src="script_simple.js"></script> -->
-    <!-- <script type="module" src="script_firebasedb.js"></script> -->
+    <!-- Include the bundled JavaScript file -->
     <script src="dist/bundle.js"></script>
 
 </body>
