@@ -1,8 +1,13 @@
+
 // Import Firebase SDKs
-import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs, addDoc, setDoc, doc, getDoc, query, where, orderBy, limit } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+
+
+
+
 
 // Your Firebase configuration (replace with your actual config)
 const firebaseConfig = {
@@ -232,6 +237,17 @@ function startTimer(duration) {
     }, 1000); // 1000 milliseconds = 1 second
 }
 
+
+/**
+ * Capitalizes the first letter of a string.
+ * @param {string} string - The string to capitalize.
+ * @returns {string} - The capitalized string.
+ */
+function capitalizeFirstLetter(string) {
+    if (!string) return string; // Handle empty or null strings
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 /**
  * Loads the current question and generates shuffled option buttons.
  */
@@ -249,9 +265,17 @@ function loadQuestion() {
     shuffledOptions.forEach((option, index) => {
         const button = document.createElement('button');
         button.classList.add('option-btn');
-        button.textContent = option;
+
+        // Capitalize the first letter of the option for display
+        const capitalizedOption = capitalizeFirstLetter(option);
+        button.textContent = capitalizedOption;
         button.disabled = false;
-        button.setAttribute('aria-label', `Option ${index + 1}: ${option}`);
+        button.setAttribute('aria-label', `Option ${index + 1}: ${capitalizedOption}`);
+
+        // Store the original option value in a data attribute
+        button.dataset.optionValue = option;
+
+        // Adjust the correct answer for capitalization when passing to selectOption
         button.addEventListener('click', () => selectOption(button, currentQuizData.correct));
         optionsContainer.appendChild(button);
     });
@@ -261,8 +285,8 @@ function loadQuestion() {
     startTimer(currentQuizData.time);
     updateProgressBar(); // Update progress bar for each question loaded
 
-    // Call the setEqualButtonHeights function to adjust button heights
-    setEqualButtonHeights(); // Reuse your existing function
+    // Adjust button heights if necessary
+    setEqualButtonHeights();
 }
 
 
@@ -308,11 +332,19 @@ function resetState() {
  * @param {HTMLElement} selectedButton - The selected button element.
  * @param {string} correctAnswer - The correct answer.
  */
+/**
+ * Handles the selection of an option and checks the answer.
+ * @param {HTMLElement} selectedButton - The selected button element.
+ * @param {string} correctAnswer - The correct answer.
+ */
 function selectOption(selectedButton, correctAnswer) {
     const allOptionButtons = document.querySelectorAll('.option-btn');
     clearInterval(timerInterval);
 
-    if (selectedButton.textContent === correctAnswer) {
+    // Retrieve the original option value
+    const selectedOptionValue = selectedButton.dataset.optionValue;
+
+    if (selectedOptionValue === correctAnswer) {
         selectedButton.classList.add('correct');
         score++;
         scoreEl.textContent = score;
@@ -320,16 +352,17 @@ function selectOption(selectedButton, correctAnswer) {
     } else {
         selectedButton.classList.add('wrong');
         playRandomSound(wrongSounds);
+
         // Highlight the correct answer
         allOptionButtons.forEach(button => {
-            if (button.textContent === correctAnswer) {
+            if (button.dataset.optionValue === correctAnswer) {
                 button.classList.add('correct');
             }
         });
     }
 
     // Disable all option buttons
-    allOptionButtons.forEach(button => button.disabled = true);
+    allOptionButtons.forEach(button => (button.disabled = true));
     nextBtn.disabled = false;
 }
 
@@ -341,6 +374,7 @@ function disableOptions() {
     allOptionButtons.forEach(button => button.disabled = true);
 }
 
+
 /**
  * Highlights the correct answer when time runs out.
  */
@@ -348,12 +382,15 @@ function highlightCorrectAnswer() {
     const currentQuizData = shuffledQuizData[currentQuestion];
     const allOptionButtons = document.querySelectorAll('.option-btn');
     allOptionButtons.forEach(button => {
-        if (button.textContent === currentQuizData.correct) {
+        if (button.dataset.optionValue === currentQuizData.correct) {
             button.classList.add('correct');
         }
     });
 }
 
+/**
+ * Displays the final results of the quiz and saves the score to Firestore.
+ */
 /**
  * Displays the final results of the quiz and saves the score to Firestore.
  */
@@ -378,11 +415,23 @@ async function showResults() {
         try {
             const user = auth.currentUser;
             if (user) {
+                // Fetch user's username from Firestore
+                const userDocRef = doc(db, 'users', user.uid);
+                const userDocSnapshot = await getDoc(userDocRef);
+                let username = user.email; // Default to email if username is not available
+
+                if (userDocSnapshot.exists()) {
+                    const userData = userDocSnapshot.data();
+                    username = userData.username || user.email;
+                } else {
+                    console.error('User document does not exist.');
+                }
+
                 const percentage = totalQuestions > 0 ? ((score / totalQuestions) * 100).toFixed(2) : '0.00';
                 const leaderboardRef = collection(db, 'leaderboard');
                 await addDoc(leaderboardRef, {
                     uid: user.uid,
-                    email: user.email,
+                    username: username,
                     score: score,
                     totalQuestions: totalQuestions,
                     percentage: parseFloat(percentage), // Store as a number for sorting
@@ -399,8 +448,9 @@ async function showResults() {
     }
 
     // Call displayLeaderboard after saving the score
-    await displayLeaderboard(); // Ensure this is called correctly
+    await displayLeaderboard();
 }
+
 
 /**
  * Updates the progress bar based on the current question.
@@ -460,14 +510,17 @@ async function displayLeaderboard() {
 
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            
+
             // Ensure totalQuestions is greater than zero to avoid division by zero
             const totalQuestions = data.totalQuestions || 0;
             const score = data.score || 0;
             const percentage = totalQuestions > 0 ? ((score / totalQuestions) * 100).toFixed(2) : '0.00';
-            
+
+            // Use data.username instead of data.email
+            const username = data.username || 'Anonymous'; // Provide a default value if username is undefined
+
             const listItem = document.createElement('li');
-            listItem.textContent = `${data.email}: ${percentage}% (${score}/${totalQuestions})`;
+            listItem.textContent = `${username}: ${percentage}% (${score}/${totalQuestions})`;
             leaderboardList.appendChild(listItem);
         });
 
@@ -513,11 +566,12 @@ const showSignupLink = document.getElementById('show-signup');
 const signupForm = document.getElementById('signup-form');
 const signupEmailInput = document.getElementById('signup-email');
 const signupPasswordInput = document.getElementById('signup-password');
+const signupUsernameInput = document.getElementById('signup-username'); // Added this line
 const signupBtn = document.getElementById('signup-btn');
 const showLoginLink = document.getElementById('show-login');
 
-const continueGuestBtn = document.getElementById('continue-guest-btn'); // New
-const signOutBtn = document.getElementById('signout-btn'); // Now in footer
+const continueGuestBtn = document.getElementById('continue-guest-btn');
+const signOutBtn = document.getElementById('signout-btn');
 
 // Toggle between login and signup forms
 showSignupLink.addEventListener('click', (e) => {
@@ -555,22 +609,51 @@ loginBtn.addEventListener('click', async () => {
 // Handle signup
 signupBtn.addEventListener('click', async (event) => {
     event.preventDefault();
-    console.log('Signup button clicked'); // Debugging statement
-    const email = signupEmailInput.value;
+
+    // Check if user is already signed in
+    if (auth.currentUser) {
+        alert('You are already signed in. Please sign out before creating a new account.');
+        return;
+    }
+
+    const username = signupUsernameInput.value.trim();
+    const email = signupEmailInput.value.trim();
     const password = signupPasswordInput.value;
 
+    if (!username || !email || !password) {
+        alert('Please fill in all the required fields.');
+        return;
+    }
+
     try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        console.log('User signed up successfully'); // Debugging statement
-        // User signed up and logged in
+        // Create the user in Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Store the username in Firestore linked to the user's UID
+        await setDoc(doc(db, "users", user.uid), {
+            username: username,
+            email: email
+        });
+
+        console.log('User signed up successfully with username:', username);
+
+        // Show a welcome message
+        alert(`Sɑ̌' pə̀pē', ${username}! Your account has been created.`);
+        // Proceed to the start screen
         authContainer.style.display = 'none';
         startScreen.style.display = 'block';
         signOutBtn.style.display = 'block';
+
     } catch (error) {
-        console.error('Signup failed:', error); // Debugging statement
-        alert('Signup failed: ' + error.message);
+        console.error('Signup failed:', error);
+        const errorMessage = error && error.message ? error.message : 'An unknown error occurred.';
+        alert('Signup failed: ' + errorMessage);
     }
 });
+
+
+
 
 // Handle "Continue as Guest"
 continueGuestBtn.addEventListener('click', () => {
@@ -582,6 +665,7 @@ continueGuestBtn.addEventListener('click', () => {
 });
 
 // Monitor Authentication State
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         // User is authenticated
@@ -590,6 +674,9 @@ onAuthStateChanged(auth, (user) => {
         startScreen.style.display = 'block';
         signOutBtn.style.display = 'block';
         isGuest = false; // Reset guest status if a user logs in
+        // Hide signup and login forms if they are visible
+        signupForm.style.display = 'none';
+        loginForm.style.display = 'none';
     } else {
         // User is signed out
         console.log('No user is signed in');
@@ -597,8 +684,10 @@ onAuthStateChanged(auth, (user) => {
             authContainer.style.display = 'block';
             startScreen.style.display = 'none';
             signOutBtn.style.display = 'none';
+            // Show login form by default
+            loginForm.style.display = 'block';
+            signupForm.style.display = 'none';
         }
-        // If isGuest is true, do not display signOutBtn
     }
 });
 

@@ -18,7 +18,7 @@ async function seedLeaderboard() {
   const sampleData = [
     {
       uid: 'user1',
-      email: 'user1@example.com',
+      username: 'Mbə̄ə̄ lɑ́',
       score: 10,
       totalQuestions: 10,
       percentage: 100.0,
@@ -26,7 +26,7 @@ async function seedLeaderboard() {
     },
     {
       uid: 'user2',
-      email: 'user2@example.com',
+      username: 'Yáá mɑ̀ lāhā?',
       score: 8,
       totalQuestions: 10,
       percentage: 80.0,
@@ -34,7 +34,7 @@ async function seedLeaderboard() {
     },
     {
       uid: 'user3',
-      email: 'user3@example.com',
+      username: 'Fʉ̀',
       score: 7,
       totalQuestions: 10,
       percentage: 70.0,
@@ -45,7 +45,7 @@ async function seedLeaderboard() {
   // Add each sample data to the leaderboard collection
   for (const data of sampleData) {
     await leaderboardRef.add(data);
-    console.log(`Added: ${data.email}`);
+    console.log(`Added: ${data.username}`);
   }
 
   console.log('Leaderboard seeding completed.');

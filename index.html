@@ -32,17 +32,29 @@
                 <p>Ŋwɑ̌' zēn zǒ: <a href="#" id="show-signup">Sign up here</a></p>
             </div>
 
-
-            <!-- Signup Form -->
+           <!-- Signup Form -->
             <div class="auth-form" id="signup-form" style="display: none;">
                 <h2>Sign Up</h2>
-                <label for="signup-email">Email:</label>
+                
+                <!-- Username Field -->
+                <label for="signup-username">Zénjɑ̀' (username):</label>                
+                <input type="text" id="signup-username" required>
+                <br>
+                <!-- Email Field -->
+                <label for="signup-email">Mbù' khʉ̀khʉ̀ɑ̄nkèn (Email):</label>
                 <input type="email" id="signup-email" required>
-                <label for="signup-password">Password:</label>
+                <br>
+                <!-- Password Field -->
+                <label for="signup-password">Kòh (Password):</label>
                 <input type="password" id="signup-password" required>
+                <br>
+                <!-- Sign Up Button -->
                 <button id="signup-btn" type="button">Sign Up</button>
+                <br>
                 <p>Already have an account? <a href="#" id="show-login">Login here</a></p>
             </div>
+
+  
             <!-- Continue as Guest Option -->
             <div class="guest-option" id="guest-option">
                 <p>Or</p>

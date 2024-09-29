@@ -471,7 +471,7 @@ footer {
     /* Adjust the next and start buttons */
     .next-btn, .start-btn {
         padding: 0.5rem 1rem; /* Reduced padding */
-        font-size: 1rem; /* Adjusted button font-size */
+        font-size: 1.2rem; /* Adjusted button font-size */
         font-family: 'Charis SIL', serif;
     }
 
