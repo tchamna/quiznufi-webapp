@@ -78,10 +78,11 @@ body {
     position: absolute;
     width: 100%;
     text-align: center;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
     color: #000;
     z-index: 1; /* Ensure it appears above the progress bar */
+    font-family: 'Charis SIL';
 }
 
 .quiz-container {
@@ -339,11 +340,12 @@ footer {
     color: white;
     padding: 0.8rem 1.5rem;
     border-radius: 25px;
-    font-size: 1.2rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: background 0.3s, transform 0.2s;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     margin-top: 20px;
+    font-family: 'Charis SIL', serif;
 }
 
 .signout-btn:hover {
@@ -438,32 +440,69 @@ footer {
 
 /* Small Devices (Mobile Phones) */
 @media (max-width: 600px) {
-    .options-container {
-        flex-direction: column;
-    }
 
-    .option-btn {
-        padding: 0.8rem 1.2rem;
-        font-size: 1rem;
-    }
-
-    header h1 {
-        font-size: 2rem; /* Adjusted from var(--title-font-size) */
-    }
-
-    .score-timer {
-        font-size: var(--score-timer-font-size);
-    }
-
+    /* Adjust question container */
     .question-container h2 {
-        font-size: var(--question-font-size);
+        font-size: 1.3rem; /* Adjusted font-size for small screens */
     }
 
+    /* Adjust score and timer */
+    .score-timer {
+        font-size: 1rem; /* Smaller font-size */
+    }
+
+    .score, .timer {
+        padding: 0.5rem 1rem; /* Reduced padding to fit small screens */
+        font-size: 1rem; /* Smaller font-size */
+    }
+
+    /* Adjust the button sizes */
+    .option-btn {
+        padding: 0.7rem 1.3rem; /* Smaller padding for small screens */
+        font-size: 1.5rem !important;  /* Adjusted font size for options */
+        
+    }
+
+    /* Progress container */
+    .progress-container {
+        height: 15px; /* Reduced height for progress bar */
+    }
+
+    /* Adjust the next and start buttons */
     .next-btn, .start-btn {
-        padding: 0.6rem 1.2rem;
-        font-size: 1rem;
+        padding: 0.5rem 1rem; /* Reduced padding */
+        font-size: 1rem; /* Adjusted button font-size */
+        font-family: 'Charis SIL', serif;
+    }
+
+    /* Reduce padding for the entire quiz container */
+    .quiz-container {
+        padding: 15px; /* Adjusted padding for small screens */
+    }
+
+    /* Reduce margin for the header */
+    header h1 {
+        font-size: 1.6rem; /* Reduced font-size for title */
+    }
+
+    /* Adjust the replay button */
+    .replay-btn {
+        padding: 0.5rem 1rem; /* Smaller padding */
+        font-size: 0.9rem; /* Reduced font-size */
+    }
+
+    /* Ensure leaderboard text fits */
+    .leaderboard li {
+        font-size: 1rem; /* Smaller font size for leaderboard */
+    }
+
+    /* Social media icons */
+    .social-media a {
+        font-size: 1.2rem; /* Adjust size of icons for mobile */
     }
 }
+
+
 
 /* Medium Devices (Tablets) */
 @media (min-width: 601px) and (max-width: 1024px) {
