@@ -94,12 +94,19 @@ df["question"] = "Que signifie « " + df["question"] + " » ?"
 # Generate quiz questions with unique wrong answers per question
 questions_set = build_quiz_questions_from2columns(df, number_of_wrong_options=3)
 
-questions_set["time"] = 15
+# questions_set["time"] = 15
+
+
 #################################################################################
 
-# Initialize Firebase Admin SDK
-cred = credentials.Certificate('quiznufi-webapp-firebase-adminsdk.json')
-firebase_admin.initialize_app(cred)
+
+# Check if the default app is already initialized
+if not firebase_admin._apps:
+    # Initialize Firebase Admin SDK
+    cred = credentials.Certificate('quiznufi-webapp-firebase-adminsdk.json')
+    firebase_admin.initialize_app(cred)
+
+
 
 # Initialize Firestore client
 db = firestore.client()
@@ -128,6 +135,8 @@ for index, row in questions_set.iterrows():
         'question': row['question'],
         'correct': row['correct'],
         'time': row['time'],
+        'difficulty_level': row['difficulty_level'],
+        'quiz_area': row['quiz_area'],
         'options': options
     }
     

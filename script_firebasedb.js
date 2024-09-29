@@ -1,7 +1,7 @@
 // Import Firebase SDKs
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, getDocs, addDoc, query, orderBy, limit } from "firebase/firestore";
+import { getFirestore, collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
 // Your Firebase configuration (replace with your actual config)
@@ -32,6 +32,8 @@ let shuffledQuizData = []; // Array to hold shuffled questions for the quiz
 let totalQuestions = 0; // Total number of questions in the round
 let isGuest = false; // Indicates if the user is a guest
 
+let quizArea = 'Yahlēh'; // Default quiz area
+
 // DOM Elements
 const questionEl = document.getElementById('question');
 const optionsContainer = document.getElementById('options-container');
@@ -43,19 +45,18 @@ const questionProgressText = document.getElementById('question-progress-text');
 const startScreen = document.getElementById('start-screen');
 const startBtn = document.getElementById('start-btn');
 const questionCountInput = document.getElementById('question-count');
+const difficultySelect = document.getElementById('difficulty-level');
+const quizAreaSelect = document.getElementById('quiz-area');
 
 // Audio Resources
 const correctSounds = [
     'resources/correct_answer1.mp3',
     'resources/correct_answer2.mp3',
 ];
-
 const wrongSounds = [
     'resources/wrong_answer1.mp3',
     'resources/wrong_answer2.mp3',
 ];
-
-// Create the background music audio object
 const timerSound = new Audio('resources/background_music_Kameni_Lebong_Esclavage.mp3');
 timerSound.loop = false;
 
@@ -100,12 +101,18 @@ function setNumberOfQuestions() {
 }
 
 /**
- * Initializes the quiz by fetching and shuffling questions.
+ * Initializes the quiz by fetching and shuffling questions based on selected difficulty and area.
  */
 async function initializeQuiz() {
     try {
-        // Fetch questions from Firestore
-        const querySnapshot = await getDocs(collection(db, "questions"));
+        // Fetch questions from Firestore based on difficulty and quiz area
+        const querySnapshot = await getDocs(
+            query(
+                collection(db, "questions"),
+                where("difficulty_level", "==", parseInt(difficultySelect.value)),
+                where("quiz_area", "==", quizArea)
+            )
+        );
         querySnapshot.forEach((doc) => {
             allQuizData.push(doc.data());
         });
@@ -120,10 +127,54 @@ async function initializeQuiz() {
 }
 
 /**
+ * Fetches available difficulty levels for the selected quiz area
+ * and populates the difficulty dropdown.
+ */
+async function fetchDifficultyLevelsForArea() {
+    try {
+        const uniqueDifficulties = new Set();
+        const querySnapshot = await getDocs(
+            query(
+                collection(db, "questions"),
+                where("quiz_area", "==", quizArea)
+            )
+        );
+        querySnapshot.forEach((doc) => {
+            uniqueDifficulties.add(doc.data().difficulty_level); // Collect unique difficulty levels
+        });
+
+        // Clear previous difficulty options
+        difficultySelect.innerHTML = '';
+
+        // Populate the dropdown with available difficulty levels
+        uniqueDifficulties.forEach(level => {
+            const option = document.createElement('option');
+            option.value = level;
+            option.textContent = `Level ${level}`;
+            difficultySelect.appendChild(option);
+        });
+
+        // Optionally set the first level as selected
+        difficultySelect.selectedIndex = 0;
+
+    } catch (error) {
+        console.error('Error fetching difficulty levels:', error);
+        alert('Failed to load difficulty levels. Please try again later.');
+    }
+}
+
+// Event Listener for Quiz Area Change
+quizAreaSelect.addEventListener('change', (e) => {
+    quizArea = e.target.value;
+    fetchDifficultyLevelsForArea(); // Fetch available difficulty levels for the selected area
+});
+
+/**
  * Starts the quiz after fetching questions and setting the number of questions.
  */
 async function startQuiz() {
     console.log('Starting the quiz...');
+
     if (allQuizData.length === 0) {
         await initializeQuiz(); // Ensure that questions are fetched before proceeding
     }
@@ -149,6 +200,7 @@ async function startQuiz() {
     loadQuestion();
 }
 
+
 /**
  * Starts the countdown timer.
  * @param {number} duration - Duration in seconds.
@@ -172,10 +224,10 @@ function startTimer(duration) {
             disableOptions(); // Disable all options
             nextBtn.disabled = false; // Enable the "Next" button
 
-            // Automatically move to the next question after 15 seconds
+            // Automatically move to the next question after 5 seconds
             autoNextTimeout = setTimeout(() => {
                 nextQuestion();
-            }, 15000);
+            }, 5000);
         }
     }, 1000); // 1000 milliseconds = 1 second
 }

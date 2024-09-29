@@ -9,7 +9,7 @@
 
     <!-- Font Awesome Kit Script -->
     <script src="https://kit.fontawesome.com/74fb0e9d79.js" crossorigin="anonymous"></script>
-    
+
 </head>
 
 <body>
@@ -101,6 +101,28 @@
                     <label for="question-count"><b>Mvǎk nte'sínu</b> (Number of Questions):</label>
                     <input type="number" id="question-count" min="1" placeholder="e.g., 5">
                 </div>
+
+                <!-- Difficulty Level Dropdown -->
+                <div class="difficulty-container">
+                    <label for="difficulty-level"><b> Ndhʉ̌ Làksì (Level):</b></label>
+                    <select id="difficulty-level">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+
+                <!-- Quiz Area Dropdown -->
+                <div class="quiz-area-container">
+                    <label for="quiz-area"><b>Ntīē Làksì (Area):</b></label>
+                    <select id="quiz-area">
+                        <!-- <option value="general">General</option> -->
+                        <option value="Yahlēh">Yahlēh</option>
+                        <option value="Tǎ'yō">Tǎ'yō</option>
+                    </select>
+                </div>
+
 
                 <!-- Start Quiz Button -->
                 <button id="start-btn" class="start-btn">Ghěnmbhi</button>
