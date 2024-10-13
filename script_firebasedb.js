@@ -1,30 +1,6 @@
+// script_firebasedb.js
 
-// Import Firebase SDKs
-import { getAnalytics } from "firebase/analytics";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc, setDoc, doc, getDoc, query, where, orderBy, limit } from "firebase/firestore";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-
-
-
-
-
-// Your Firebase configuration (replace with your actual config)
-const firebaseConfig = {
-    apiKey: process.env.FIREBASE_API_KEY,
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.FIREBASE_APP_ID,
-    measurementId: process.env.FIREBASE_MEASUREMENT_ID,
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
-const auth = getAuth(app);
+// db and auth are already initialized in firebaseConfig.js
 
 // State Variables
 let currentQuestion = 0;
@@ -37,7 +13,7 @@ let shuffledQuizData = []; // Array to hold shuffled questions for the quiz
 let totalQuestions = 0; // Total number of questions in the round
 let isGuest = false; // Indicates if the user is a guest
 
-let quizArea = 'Yahlēh'; // Default quiz area
+let quizArea = 'Mbíághə̀ə̀'; // Default quiz area
 
 // DOM Elements
 const questionEl = document.getElementById('question');
@@ -111,13 +87,11 @@ function setNumberOfQuestions() {
 async function initializeQuiz() {
     try {
         // Fetch questions from Firestore based on difficulty and quiz area
-        const querySnapshot = await getDocs(
-            query(
-                collection(db, "questions"),
-                where("difficulty_level", "==", parseInt(difficultySelect.value)),
-                where("quiz_area", "==", quizArea)
-            )
-        );
+        const querySnapshot = await db
+            .collection("questions")
+            .where("difficulty_level", "==", parseInt(difficultySelect.value))
+            .where("quiz_area", "==", quizArea)
+            .get();
         querySnapshot.forEach((doc) => {
             allQuizData.push(doc.data());
         });
@@ -138,12 +112,10 @@ async function initializeQuiz() {
 async function fetchDifficultyLevelsForArea() {
     try {
         const uniqueDifficulties = new Set();
-        const querySnapshot = await getDocs(
-            query(
-                collection(db, "questions"),
-                where("quiz_area", "==", quizArea)
-            )
-        );
+        const querySnapshot = await db
+            .collection("questions")
+            .where("quiz_area", "==", quizArea)
+            .get();
         querySnapshot.forEach((doc) => {
             uniqueDifficulties.add(doc.data().difficulty_level); // Collect unique difficulty levels
         });
@@ -205,7 +177,6 @@ async function startQuiz() {
     loadQuestion();
 }
 
-
 /**
  * Starts the countdown timer.
  * @param {number} duration - Duration in seconds.
@@ -237,15 +208,26 @@ function startTimer(duration) {
     }, 1000); // 1000 milliseconds = 1 second
 }
 
-
 /**
- * Capitalizes the first letter of a string.
- * @param {string} string - The string to capitalize.
- * @returns {string} - The capitalized string.
+ * Formats a string as a sentence with proper capitalization and punctuation.
+ * @param {string} string - The string to format.
+ * @returns {string} - The formatted string.
  */
-function capitalizeFirstLetter(string) {
+function formatSentence(string) {
     if (!string) return string; // Handle empty or null strings
-    return string.charAt(0).toUpperCase() + string.slice(1);
+
+    // Trim leading and trailing whitespace
+    string = string.trim();
+
+    // Capitalize the first letter
+    string = string.charAt(0).toUpperCase() + string.slice(1);
+
+    // Add a period if the string doesn't end with a punctuation mark
+    if (!/[.!?]$/.test(string)) {
+        string += '.';
+    }
+
+    return string;
 }
 
 /**
@@ -267,7 +249,7 @@ function loadQuestion() {
         button.classList.add('option-btn');
 
         // Capitalize the first letter of the option for display
-        const capitalizedOption = capitalizeFirstLetter(option);
+        const capitalizedOption = formatSentence(option);
         button.textContent = capitalizedOption;
         button.disabled = false;
         button.setAttribute('aria-label', `Option ${index + 1}: ${capitalizedOption}`);
@@ -289,9 +271,7 @@ function loadQuestion() {
     setEqualButtonHeights();
 }
 
-
 /**
- * Reuse the existing setEqualButtonHeights function.
  * Adjusts the height of all buttons to match the tallest one.
  */
 function setEqualButtonHeights() {
@@ -317,7 +297,6 @@ function setEqualButtonHeights() {
     });
 }
 
-
 /**
  * Resets the state before loading a new question.
  */
@@ -327,11 +306,6 @@ function resetState() {
     clearTimeout(autoNextTimeout);
 }
 
-/**
- * Handles the selection of an option and checks the answer.
- * @param {HTMLElement} selectedButton - The selected button element.
- * @param {string} correctAnswer - The correct answer.
- */
 /**
  * Handles the selection of an option and checks the answer.
  * @param {HTMLElement} selectedButton - The selected button element.
@@ -374,7 +348,6 @@ function disableOptions() {
     allOptionButtons.forEach(button => button.disabled = true);
 }
 
-
 /**
  * Highlights the correct answer when time runs out.
  */
@@ -388,9 +361,6 @@ function highlightCorrectAnswer() {
     });
 }
 
-/**
- * Displays the final results of the quiz and saves the score to Firestore.
- */
 /**
  * Displays the final results of the quiz and saves the score to Firestore.
  */
@@ -413,44 +383,59 @@ async function showResults() {
     // Save score to Firestore leaderboard only if the user is authenticated (not a guest)
     if (!isGuest) {
         try {
-            const user = auth.currentUser;
-            if (user) {
-                // Fetch user's username from Firestore
-                const userDocRef = doc(db, 'users', user.uid);
-                const userDocSnapshot = await getDoc(userDocRef);
-                let username = user.email; // Default to email if username is not available
-
-                if (userDocSnapshot.exists()) {
-                    const userData = userDocSnapshot.data();
-                    username = userData.username || user.email;
-                } else {
-                    console.error('User document does not exist.');
-                }
-
-                const percentage = totalQuestions > 0 ? ((score / totalQuestions) * 100).toFixed(2) : '0.00';
-                const leaderboardRef = collection(db, 'leaderboard');
-                await addDoc(leaderboardRef, {
-                    uid: user.uid,
-                    username: username,
-                    score: score,
-                    totalQuestions: totalQuestions,
-                    percentage: parseFloat(percentage), // Store as a number for sorting
-                    timestamp: new Date()
-                });
-                console.log('Score saved to leaderboard.');
+          const user = firebase.auth().currentUser;
+          if (user) {
+            // Fetch user's username
+            const userDocRef = firebase.firestore().collection('users').doc(user.uid);
+            const userDocSnapshot = await userDocRef.get();
+            let username = user.email;
+    
+            if (userDocSnapshot.exists) {
+              const userData = userDocSnapshot.data();
+              username = userData.username || user.email;
             }
+    
+            const percentage = totalQuestions > 0 ? ((score / totalQuestions) * 100).toFixed(2) : '0.00';
+            const leaderboardRef = firebase.firestore().collection('leaderboard');
+    
+            // Log data before writing
+            console.log('Saving to leaderboard:', {
+              uid: user.uid,
+              username: username,
+              score: score,
+              totalQuestions: totalQuestions,
+              percentage: parseFloat(percentage),
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+    
+            // Write to Firestore
+           
+
+            await leaderboardRef.add({
+                uid: user.uid,
+                username: username,
+                score: parseInt(score), // Ensure it's an integer
+                totalQuestions: parseInt(totalQuestions), // Ensure it's an integer
+                percentage: parseFloat(percentage), // Ensure it's a number
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+              });
+              
+    
+            console.log('Score saved to leaderboard.');
+          } else {
+            console.error('No authenticated user found.');
+          }
         } catch (error) {
-            console.error('Error saving score to leaderboard:', error);
-            alert('Failed to save score to leaderboard.');
+          console.error('Error saving score to leaderboard:', error);
+          alert('Failed to save score to leaderboard.');
         }
-    } else {
+      } else {
         console.log('Guest user did not save score to leaderboard.');
-    }
+      }
 
     // Call displayLeaderboard after saving the score
     await displayLeaderboard();
 }
-
 
 /**
  * Updates the progress bar based on the current question.
@@ -496,14 +481,12 @@ async function displayLeaderboard() {
     leaderboardContainer.innerHTML = '<h2>Leaderboard</h2>';
 
     try {
-        const leaderboardRef = collection(db, 'leaderboard');
-        const q = query(
-            leaderboardRef,
-            orderBy('percentage', 'desc'),  // Primary sort: percentage descending
-            orderBy('timestamp', 'asc'),    // Secondary sort: timestamp ascending
-            limit(10)                       // Limit to top 10 entries
-        );
-        const querySnapshot = await getDocs(q);
+        const leaderboardRef = db.collection('leaderboard');
+        const querySnapshot = await leaderboardRef
+            .orderBy('percentage', 'desc')  // Primary sort: percentage descending
+            .orderBy('timestamp', 'asc')    // Secondary sort: timestamp ascending
+            .limit(10)
+            .get();
         console.log('Fetched leaderboard data:', querySnapshot.docs.length); // Debugging statement
 
         const leaderboardList = document.createElement('ol');
@@ -566,7 +549,7 @@ const showSignupLink = document.getElementById('show-signup');
 const signupForm = document.getElementById('signup-form');
 const signupEmailInput = document.getElementById('signup-email');
 const signupPasswordInput = document.getElementById('signup-password');
-const signupUsernameInput = document.getElementById('signup-username'); // Added this line
+const signupUsernameInput = document.getElementById('signup-username');
 const signupBtn = document.getElementById('signup-btn');
 const showLoginLink = document.getElementById('show-login');
 
@@ -594,7 +577,7 @@ loginBtn.addEventListener('click', async () => {
     const password = loginPasswordInput.value;
 
     try {
-        await signInWithEmailAndPassword(auth, email, password);
+        await auth.signInWithEmailAndPassword(email, password);
         console.log('User logged in successfully');
         // User logged in
         authContainer.style.display = 'none';
@@ -627,11 +610,11 @@ signupBtn.addEventListener('click', async (event) => {
 
     try {
         // Create the user in Firebase Authentication
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
         const user = userCredential.user;
 
         // Store the username in Firestore linked to the user's UID
-        await setDoc(doc(db, "users", user.uid), {
+        await db.collection("users").doc(user.uid).set({
             username: username,
             email: email
         });
@@ -652,9 +635,6 @@ signupBtn.addEventListener('click', async (event) => {
     }
 });
 
-
-
-
 // Handle "Continue as Guest"
 continueGuestBtn.addEventListener('click', () => {
     console.log('Continue as Guest clicked');
@@ -665,8 +645,7 @@ continueGuestBtn.addEventListener('click', () => {
 });
 
 // Monitor Authentication State
-
-onAuthStateChanged(auth, (user) => {
+auth.onAuthStateChanged(function(user) {
     if (user) {
         // User is authenticated
         console.log('User is signed in:', user.email);

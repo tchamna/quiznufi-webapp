@@ -33,4 +33,18 @@ module.exports = {
     }),
   ],
   devtool: 'source-map', // Optional: for easier debugging
+
+  // Dev Server Configuration
+  devServer: {
+    static: {
+      directory: path.join(__dirname, 'dist'), // Serve files from 'dist' directory
+    },
+    compress: true, // Enable gzip compression for everything served
+    port: 8080, // Port to run the server on
+    open: true, // Open the browser after the server is started
+    hot: true, // Enable Hot Module Replacement (HMR)
+    client: {
+      overlay: true, // Show error messages on the browser overlay
+    },
+  },
 };

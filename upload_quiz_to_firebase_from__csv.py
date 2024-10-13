@@ -88,16 +88,24 @@ def build_quiz_questions_from2columns(data, number_of_wrong_options=3):
 csv_file_path = r"quiznufi.csv"
 df = pd.read_csv(csv_file_path)
 
+df_zhigheu = df[df["quiz_area"] == "Zhíghə̀ə̄lɑ̄'"]
+df_mbiagheu = df[df["quiz_area"] != "Zhíghə̀ə̄lɑ̄'"]
+
 # Add formatted question column
-df["question"] = "Que signifie « " + df["question"] + " » ?"
+df_mbiagheu["question"] = "Que signifie « " + df_mbiagheu["question"] + " » ?"
 
+# df = pd.concat([df_mbiagheu,df_zhigheu])
 # Generate quiz questions with unique wrong answers per question
-questions_set = build_quiz_questions_from2columns(df, number_of_wrong_options=3)
-
+questions_set_1 = build_quiz_questions_from2columns(df_zhigheu, number_of_wrong_options=3)
+questions_set_2 = build_quiz_questions_from2columns(df_mbiagheu, number_of_wrong_options=3)
+questions_set = pd.concat([questions_set_1,questions_set_2])
 # questions_set["time"] = 15
 
-
+output_file_path = 'quiznufi_with_options.csv'
+questions_set.to_csv(output_file_path, index=False, encoding="utf-8-sig")
 #################################################################################
+# good_data_path = r"quiznufi_with_options_reworked.csv"
+# questions_set = pd.read_csv(good_data_path)
 
 
 # Check if the default app is already initialized

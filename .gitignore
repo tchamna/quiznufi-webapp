@@ -3,7 +3,7 @@ node_modules/
 .firebase/
 .github/
 # functions/
-
+firebaseConfig.js
 public/
 # Log files
 npm-debug.log*

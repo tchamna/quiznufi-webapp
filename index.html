@@ -6,10 +6,15 @@
     <title>Má'zhínǔ Nufī</title>
     <!-- Your CSS -->
     <link rel="stylesheet" href="styles.css">
-
     <!-- Font Awesome Kit Script -->
     <script src="https://kit.fontawesome.com/74fb0e9d79.js" crossorigin="anonymous"></script>
-
+    <!-- Firebase SDKs for Firebase 8.x -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <!-- Firebase Config -->
+    <script src="firebaseConfig.js"></script>
 </head>
 
 <body>
@@ -26,18 +31,15 @@
                 <input type="password" id="login-password" required>
                 <br><br>
                 <button id="login-btn" type="button" class="fancy-button">Cōndʉ̄ɑ̄ (Login)</button>
-                
-                
                 <br><br>
                 <p>Ŋwɑ̌' zēn zǒ: <a href="#" id="show-signup">Sign up here</a></p>
             </div>
 
-           <!-- Signup Form -->
+            <!-- Signup Form -->
             <div class="auth-form" id="signup-form" style="display: none;">
                 <h2>Sign Up</h2>
-                
                 <!-- Username Field -->
-                <label for="signup-username">Zénjɑ̀' (username):</label>                
+                <label for="signup-username">Zénjɑ̀' (username):</label>
                 <input type="text" id="signup-username" required>
                 <br>
                 <!-- Email Field -->
@@ -54,7 +56,6 @@
                 <p>Already have an account? <a href="#" id="show-login">Login here</a></p>
             </div>
 
-  
             <!-- Continue as Guest Option -->
             <div class="guest-option" id="guest-option">
                 <p>Or</p>
@@ -118,10 +119,10 @@
                 <div class="difficulty-container">
                     <label for="difficulty-level"><b> Ndhʉ̌ Làksì (Level):</b></label>
                     <select id="difficulty-level">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
+                        <option value="1">Level 1</option>
+                        <option value="2">Level 2</option>
+                        <option value="3">Level 3</option>
+                        <option value="4">Level 4</option>
                     </select>
                 </div>
 
@@ -129,12 +130,10 @@
                 <div class="quiz-area-container">
                     <label for="quiz-area"><b>Ntīē Làksì (Area):</b></label>
                     <select id="quiz-area">
-                        <!-- <option value="general">General</option> -->
-                        <option value="Yahlēh">Yahlēh</option>
-                        <option value="Tǎ'yō">Tǎ'yō</option>
+                        <option value="Mbíághə̀ə̀">Mbíághə̀ə̀</option>
+                        <option value="Zhíghə̀ə̄lɑ̄'">Zhíghə̀ə̄lɑ̄'</option>
                     </select>
                 </div>
-
 
                 <!-- Start Quiz Button -->
                 <button id="start-btn" class="start-btn">Ghěnmbhi</button>
@@ -154,8 +153,7 @@
         </footer>
     </div>
 
-    <!-- Include the bundled JavaScript file -->
-    <script src="dist/bundle.js"></script>
-
+    <!-- Include your JavaScript file -->
+    <script src="script_firebasedb.js"></script>
 </body>
 </html>

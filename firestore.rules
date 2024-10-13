@@ -5,24 +5,25 @@ service cloud.firestore {
 
     // Leaderboard: Authenticated users can read and write their own scores
     match /leaderboard/{document} {
-      // Allow authenticated users to read the leaderboard
       allow read: if request.auth != null;
 
-      // Allow authenticated users to write to the leaderboard with data validation
       allow write: if request.auth != null
-        && request.resource.data.keys().hasAll(['uid', 'username', 'score', 'totalQuestions', 'percentage', 'timestamp'])
-        && request.resource.data.size() == 6 // Adjusted to 6 fields
-        && request.resource.data.uid == request.auth.uid // Ensure users write only their own data
+        && request.resource.data.keys().hasOnly([
+          'uid', 'username', 'score', 'totalQuestions', 'percentage', 'timestamp'
+        ])
+        && request.resource.data.size() == 6
+        && request.resource.data.uid == request.auth.uid
         && request.resource.data.username is string
         && request.resource.data.score is int
         && request.resource.data.totalQuestions is int
-        && request.resource.data.percentage is float
+        && request.resource.data.percentage is number // Accept any number
         && request.resource.data.score >= 0
         && request.resource.data.totalQuestions > 0
         && request.resource.data.percentage >= 0.0
         && request.resource.data.percentage <= 100.0
-        && request.resource.data.timestamp is timestamp; // Validate the timestamp
+        && (request.resource.data.timestamp is timestamp || request.resource.data.timestamp == null);
     }
+
 
     // Users: Authenticated users can read and write their own user document
     match /users/{userId} {
@@ -44,3 +45,4 @@ service cloud.firestore {
     }
   }
 }
+
