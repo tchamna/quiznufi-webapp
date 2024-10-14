@@ -1,14 +1,19 @@
 {
-  "indexes": [
-    {
-      "collectionGroup": "leaderboard",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "percentage", "order": "DESCENDING" },
-        { "fieldPath": "timestamp", "order": "ASCENDING" },
-        { "fieldPath": "__name__", "order": "ASCENDING" }
-      ]
-    }
-  ],
-  "fieldOverrides": []
-}
+    "indexes": [
+      {
+        "collectionGroup": "leaderboard",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "percentage",
+            "order": "DESCENDING"
+          },
+          {
+            "fieldPath": "timestamp",
+            "order": "ASCENDING"
+          }
+        ]
+      }
+    ],
+    "fieldOverrides": []
+  }

@@ -18,6 +18,9 @@
 </head>
 
 <body>
+
+    
+
     <div class="quiz-container">
         <!-- Authentication Screen -->
         <div class="auth-container" id="auth-container">
@@ -85,8 +88,9 @@
                 <!-- Author Description -->
                 <div class="author-description">
                     <p>
-                        This quiz was created by Shck Tchamna for Resulam. Please support its development.
+                        This quiz was created by Shck Tchamna for Resulam.<br>Please kindly support its development.
                     </p>
+                    <p> <b>Email</b>: contact@resulam.com</p>
                 </div>
 
                 <!-- Dictionary Promotion -->
@@ -94,7 +98,7 @@
                     <p>
                         To learn Nufi languages seriously, get this dictionary:
                         <a href="https://play.google.com/store/apps/details?id=com.resulam.android.NufiTchamna_nufi_francais_nufi&hl=en_US&pli=1" target="_blank" rel="noopener noreferrer">
-                            <br>Download on Google Play Store
+                            <br><br>Download on Google Play Store
                         </a>.
                     </p>
                 </div>
@@ -118,14 +122,16 @@
                 <!-- Difficulty Level Dropdown -->
                 <div class="difficulty-container">
                     <label for="difficulty-level"><b> Ndhʉ̌ Làksì (Level):</b></label>
+                   
                     <select id="difficulty-level">
                         <option value="1">Level 1</option>
                         <option value="2">Level 2</option>
                         <option value="3">Level 3</option>
                         <option value="4">Level 4</option>
                     </select>
+                    
                 </div>
-
+                <br>
                 <!-- Quiz Area Dropdown -->
                 <div class="quiz-area-container">
                     <label for="quiz-area"><b>Ntīē Làksì (Area):</b></label>
@@ -134,7 +140,7 @@
                         <option value="Zhíghə̀ə̄lɑ̄'">Zhíghə̀ə̄lɑ̄'</option>
                     </select>
                 </div>
-
+                <br>
                 <!-- Start Quiz Button -->
                 <button id="start-btn" class="start-btn">Ghěnmbhi</button>
             </div>
@@ -149,9 +155,22 @@
         <footer>
             <button class="next-btn" id="next-btn" disabled style="display: none;">Ghěnmbhi</button>
             <!-- Sign Out Button -->
-            <button id="signout-btn" class="signout-btn" style="display: none;">Sign Out</button>
+            <button id="signout-btn" class="signout-btn" style="display: none;">Tōm</button>
+
+             
+            
         </footer>
+
+        <!-- Volume Slider for Background Music -->
+         <br>
+        <div class="volume-control">
+            <label for="volume-slider">Nzhì Yɔ̌nshì:</label>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1">
+        </div>
+
     </div>
+
+    
 
     <!-- Include your JavaScript file -->
     <script src="script_firebasedb.js"></script>

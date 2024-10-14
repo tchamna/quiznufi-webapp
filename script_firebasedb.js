@@ -29,6 +29,8 @@ const questionCountInput = document.getElementById('question-count');
 const difficultySelect = document.getElementById('difficulty-level');
 const quizAreaSelect = document.getElementById('quiz-area');
 
+
+
 // Audio Resources
 const correctSounds = [
     'resources/correct_answer1.mp3',
@@ -41,13 +43,25 @@ const wrongSounds = [
 const timerSound = new Audio('resources/background_music_Kameni_Lebong_Esclavage.mp3');
 timerSound.loop = false;
 
-// Event Listener for when the music ends, so it can restart
+// Set the initial volume based on slider default value
+const volumeSlider = document.getElementById('volume-slider');
+timerSound.volume = volumeSlider.value; // Initial volume based on slider position
+
+// Restart the audio when it ends
 timerSound.addEventListener('ended', () => {
     timerSound.currentTime = 0;
     timerSound.play().catch(error => {
         console.warn('Timer sound playback was prevented:', error);
     });
 });
+
+// Volume control
+volumeSlider.addEventListener('input', (event) => {
+    timerSound.volume = event.target.value;
+    console.log(`Background music volume set to: ${timerSound.volume}`);
+});
+
+
 
 /**
  * Shuffles an array in place using the Fisher-Yates algorithm.
@@ -149,33 +163,33 @@ quizAreaSelect.addEventListener('change', (e) => {
 /**
  * Starts the quiz after fetching questions and setting the number of questions.
  */
+
 async function startQuiz() {
     console.log('Starting the quiz...');
-
     if (allQuizData.length === 0) {
-        await initializeQuiz(); // Ensure that questions are fetched before proceeding
+        await initializeQuiz();
     }
 
-    setNumberOfQuestions(); // Set the number of questions based on user input
-
-    // Hide start screen and show quiz screen
+    setNumberOfQuestions();
     startScreen.style.display = 'none';
-    document.querySelector('header').style.display = 'block'; // Show the header
+    document.querySelector('header').style.display = 'block';
     document.getElementById('question-container').style.display = 'block';
     document.getElementById('options-container').style.display = 'flex';
     nextBtn.style.display = 'inline-block';
 
     console.log('Header is now visible.');
 
-    // Start background music once when the quiz starts
+    // Set audio volume based on slider and start playback
+    timerSound.volume = volumeSlider.value;
     try {
-        await timerSound.play(); // Use await to handle any playback errors
+        await timerSound.play();
     } catch (error) {
         console.warn('Timer sound playback was prevented:', error);
     }
 
     loadQuestion();
 }
+
 
 /**
  * Starts the countdown timer.
@@ -478,7 +492,7 @@ async function displayLeaderboard() {
     console.log('Displaying leaderboard...');
     const leaderboardContainer = document.createElement('div');
     leaderboardContainer.classList.add('leaderboard');
-    leaderboardContainer.innerHTML = '<h2>Leaderboard</h2>';
+    leaderboardContainer.innerHTML = "<h2>Nkǒ' Pɑ̀túmōh</h2>";
 
     try {
         const leaderboardRef = db.collection('leaderboard');
